@@ -63,7 +63,7 @@ void keyStrike(byte x, byte y) {
     if (keyStroke[y][x] == 0) {
       caps = !caps;
       capsLock=!capsLock;
-      //Serial.println("press caps:" + String(caps) + ",stroke:" + (keyStroke[y][x]));
+      Serial.println("press caps:" + String(caps) + ",stroke:" + (keyStroke[y][x]));
       Keyboard.press(keyValue[y][x]);
       keyStroke[y][x] ++;
     }
