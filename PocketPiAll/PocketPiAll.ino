@@ -2,7 +2,7 @@
    @Author: Mm1KEE
    @GitHub: https://github.com/Mm1KEE/PocketPiInput
    @Date: 2022-09-18 00:57:54
- * @LastEditTime: 2022-10-23 18:34:03
+ * @LastEditTime: 2022-10-23 19:17:02
    @Description: PocketPi驱动，包含键盘、触摸、大写锁定灯、电量指示灯.详情见上方网址的READDME.
 
    Copyright (c) 2022 by Mm1KEE, All Rights Reserved.
@@ -16,6 +16,7 @@
 Adafruit_NeoPixel pixels(2, 7, NEO_GRB + NEO_KHZ800);
 XPT2046_Touchscreen touch(PIN_SPI_SS, 255);
 SmoothTouch st(touch, 2);
+
 
 void setup() {
   Keyboard.begin();

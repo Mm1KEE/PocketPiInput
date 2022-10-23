@@ -1,12 +1,12 @@
 /*
- * @Author: Mm1KEE
- * @GitHub: https://github.com/Mm1KEE/PocketPiInput
- * @Date: 2022-10-23 17:59:22
- * @LastEditTime: 2022-10-23 18:31:25
- * @Description: PocketPi键盘驱动.使用Caps代替Shift和Fn.
- * 
- * Copyright (c) 2022 by Mm1KEE, All Rights Reserved. 
- */
+   @Author: Mm1KEE
+   @GitHub: https://github.com/Mm1KEE/PocketPiInput
+   @Date: 2022-10-23 17:59:22
+   @LastEditTime: 2022-10-23 18:31:25
+   @Description: PocketPi键盘驱动.使用Caps代替Shift和Fn.
+
+   Copyright (c) 2022 by Mm1KEE, All Rights Reserved.
+*/
 
 byte row[10] = {13, A0, A1, A2, A3, 1, 0, 2, 3, 11};
 byte col[7] = { 10, 9, 8, 6, 12, 4, 30};
@@ -36,7 +36,7 @@ byte keyStroke[5][14] = {
 };
 byte x, y;
 long t;
-bool caps = false,capsLock=false;
+bool caps = false, capsLock = false;
 int pinIndex = 0;
 int untouchedT = 0;
 
@@ -51,55 +51,42 @@ void initKeyboard() {
     pinMode(row[j], INPUT);
     digitalWrite(row[j], HIGH);
   }
-  pressMax=abs(pressMax);
-  releaseMax=-abs(releaseMax);
+  pressMax = abs(pressMax);
+  releaseMax = -abs(releaseMax);
   //Serial.println("--------");
 }
 
 void keyStrike(byte x, byte y) {
   //Serial.println("press key,x:" + String(x) + ",y:" + String(y) + ",stroke:" + (keyStroke[y][x]) + ",value:" + keyValue[y][x]);
-  if (x == 0 & y == 2) {
-    //Serial.println("press caps:" + String(caps) + ",stroke:" + (keyStroke[y][x]));
-    if (keyStroke[y][x] == 0) {
+  if (keyStroke[y][x] < pressMax) keyStroke[y][x]++;
+  else if (keyStroke[y][x] == pressMax) {
+    Keyboard.press(caps ? keyValueAlt[y][x] : keyValue[y][x]);
+    //Serial.println("press key,x:" + String(x) + ",y:" + String(y) + ",stroke:" + (keyStroke[y][x]) + ",value:" + keyValue[y][x]);
+    //Keyboard.press(keyValue[y][x]);
+    keyStroke[y][x] = pressMax + 1;
+    if (x == 0 & y == 2) {
       caps = !caps;
-      capsLock=!capsLock;
+      capsLock = !capsLock;
       Serial.println("press caps:" + String(caps) + ",stroke:" + (keyStroke[y][x]));
-      Keyboard.press(keyValue[y][x]);
-      keyStroke[y][x] ++;
-    }
-    else {}
-  }
-  else {
-    if (keyStroke[y][x] < pressMax) keyStroke[y][x]++;
-    else if(keyStroke[y][x]==pressMax){
-      Keyboard.press(caps ? keyValueAlt[y][x] : keyValue[y][x]);
-      //Serial.println("press key,x:" + String(x) + ",y:" + String(y) + ",stroke:" + (keyStroke[y][x]) + ",value:" + keyValue[y][x]);
-      //Keyboard.press(keyValue[y][x]);
-      keyStroke[y][x]=pressMax+1;
     }
   }
+
 }
 
 void keyRelease(byte x, byte y) {
-  if (x == 0 & y == 2) {
-    //Serial.println("release caps:" + String(caps) + ",stroke:" + (keyStroke[y][x]));
-    if (keyStroke[y][x] == 1) {
-      caps = !caps;
-      //Serial.println("release caps:" + String(caps) + ",stroke:" + String(keyStroke[y][x]));
-      Keyboard.release(keyValue[y][x]);
-      keyStroke[y][x] = 0;
-    }
-    else {}
-  }
-  else {
+  //Serial.println("release key,x:" + String(x) + ",y:" + String(y) + ",stroke:" + (keyStroke[y][x]) + ",value:" + keyValue[y][x]);
+  if (keyStroke[y][x] > releaseMax )keyStroke[y][x]--;
+  else  if (keyStroke[y][x] == releaseMax) {
+    Keyboard.release(caps ? keyValueAlt[y][x] : keyValue[y][x]);
+    keyStroke[y][x] = releaseMax - 1;
     //Serial.println("release key,x:" + String(x) + ",y:" + String(y) + ",stroke:" + (keyStroke[y][x]) + ",value:" + keyValue[y][x]);
-    if (keyStroke[y][x] >releaseMax )keyStroke[y][x]--;
-    else  if (keyStroke[y][x]== releaseMax) {
-        Keyboard.release(caps ? keyValueAlt[y][x] : keyValue[y][x]);
-        keyStroke[y][x] = releaseMax-1;
-        //Serial.println("release key,x:" + String(x) + ",y:" + String(y) + ",stroke:" + (keyStroke[y][x]) + ",value:" + keyValue[y][x]);
-      }
+    if (x == 0 & y == 2) {
+      caps = !caps;
+      Serial.println("press caps:" + String(caps) + ",stroke:" + (keyStroke[y][x]));
+    }
+
   }
+
 }
 
 void updateKeyboard() {
